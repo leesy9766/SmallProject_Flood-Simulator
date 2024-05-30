@@ -2,13 +2,13 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Uu]ser[Ss]ettings/
+SmallProject_FloodSimulator/[Ll]ibrary/
+SmallProject_FloodSimulator/[Tt]emp/
+SmallProject_FloodSimulator/[Oo]bj/
+SmallProject_FloodSimulator/[Bb]uild/
+SmallProject_FloodSimulator/[Bb]uilds/
+SmallProject_FloodSimulator/[Ll]ogs/
+SmallProject_FloodSimulator/[Uu]ser[Ss]ettings/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
