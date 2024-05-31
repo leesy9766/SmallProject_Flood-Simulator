@@ -15,6 +15,15 @@ public class Manhole : MonoBehaviour
             other.GetComponent<Manhole_Checker>().Manhole_List.Add(this);
             Debug.Log("발견된 맨홀 갯수 : " + other.GetComponent<Manhole_Checker>().Manhole_List.Count);
         }
+
+
+        //to. 미래의 나에게...이것도 고쳐..
+        if(other.CompareTag("Manhole"))
+        {
+            Debug.Log("설치 불가 위치");
+            Destroy(this);
+            other.GetComponent<Manhole_Checker>().Manhole_List.Remove(this);
+        }
     }
 
     private void OnTriggerStay(Collider other)

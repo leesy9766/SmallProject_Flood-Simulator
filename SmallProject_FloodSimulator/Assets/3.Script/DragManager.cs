@@ -100,8 +100,8 @@ public class DragManager : MonoBehaviour
                 deltaPos_UI = startPos_UI + (nowPos_UI - startPos_UI) / 2;
 
 
-                DragCollider_obj.transform.position = deltaPos;
-                DragCollider_obj.transform.localScale = new Vector3(deltaX, 10f, deltaZ);
+                DragCollider_obj.transform.position = new Vector3(deltaPos.x, 0f, deltaPos.z);      //deltaPos;
+                DragCollider_obj.transform.localScale = new Vector3(deltaX, 20f, deltaZ);
 
                 WaterPlane_obj.transform.position = new Vector3(deltaPos.x, waterPlanePosY, deltaPos.z);
                 WaterPlane_obj.transform.localScale = new Vector3(DragCollider_obj.transform.localScale.x, 0.1f, DragCollider_obj.transform.localScale.z);
