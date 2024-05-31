@@ -24,7 +24,6 @@ public class Camera_Movement : MonoBehaviour
     private Vector3 current_MousePos;
 
     
-    private bool rightclicked = false;  //좌클릭 되었는가 판단
 
 
     //[SerializeField] private float rotCamXAxisSpeed = 5f; // 카메라 x축 회전속도

@@ -8,23 +8,55 @@ public class DragManager : MonoBehaviour
 {
     //마우스 우클릭으로 드래그앤 드롭 시 지역 선택되는 드래그 매니저
 
+    [Header("ETC")]
     [SerializeField] Button_Panel button_panel;
     [SerializeField] private Camera UI_Camera;
-    [SerializeField] private GameObject DragParent;
-    [SerializeField] private Image squareImage;
-    [SerializeField] private Image squareImagePrefab;
-    [SerializeField] private GameObject Drag_obj;
-    [SerializeField] private GameObject Drag_Prefab;
 
+
+    //부모오브젝트--------------------------------------
+    [Header("Parent Object")]
+    [SerializeField] private GameObject DragImage_Parent;
+    [SerializeField] private GameObject DragCollider_Parent;
+    [SerializeField] private GameObject WaterPlane_Parent;
+
+
+    //UI 화면상 드래깅 이미지 프리팹 ---------------------------
+    [Header("Drag Image")]
+    [SerializeField] private Image DragImage_obj;
+    [SerializeField] private Image DragImage_Prefab;
+
+
+    //World 상 드래그 콜라이더 박스(맨홀 검출용) 프리팹------------
+    [Header("Drag Collider")]
+    [SerializeField] private GameObject DragCollider_obj;
+    [SerializeField] private GameObject DragCollider_Prefab;
+
+
+    //물 프리팹-------------------------------------------------
+    [Header("Water Plane")]
+    [SerializeField] private GameObject WaterPlane_obj;
+    [SerializeField] private GameObject WaterPlane_Prefab;
+    
+    private float waterPlanePosY = 1.4f;    //WaterPlane y축 시작점
+
+
+    //world상 드래그 시 좌표 변수---------------------------
+    [Header("Point Variable : World Object")]
     [SerializeField] private Vector3 startPos;
     [SerializeField] private Vector3 deltaPos;
     [SerializeField] private Vector3 nowPos;
-
     float deltaX, deltaZ;
 
-    [SerializeField] private float lengthX;
-    [SerializeField] private float lengthY;
-    [SerializeField] private Vector2 squarePos;
+
+    [Header("Point Variable : UI")]
+    private Vector2 startPos_UI;
+    private Vector2 deltaPos_UI;
+    private Vector2 nowPos_UI;
+    float deltaX_UI, deltaY_UI;
+
+
+    //UI 오브젝트 크기 변수----------------------------
+
 
     public bool bcanDrag = false;
 
@@ -36,28 +68,56 @@ public class DragManager : MonoBehaviour
             {
                 //클릭한 순간 오브젝트 Instancitate(), position은 startpos와 nowpos의 중간좌표
                 startPos = button_panel.GetMouseWorldPosition();
+                startPos_UI = Input.mousePosition;
+                
                 Debug.Log(startPos);
 
-                Drag_obj = Instantiate(Drag_Prefab, startPos, Quaternion.identity);
+                DragCollider_obj = Instantiate(DragCollider_Prefab, startPos, Quaternion.identity);
+                DragCollider_obj.transform.SetParent(DragCollider_Parent.transform);
+                SystemManager.instance.DragObj_List.Add(DragCollider_obj);
+
+                WaterPlane_obj = Instantiate(WaterPlane_Prefab, new Vector3(startPos.x, waterPlanePosY, startPos.z), Quaternion.identity);
+                WaterPlane_obj.transform.SetParent(WaterPlane_Parent.transform);
+                SystemManager.instance.WaterPlaneObj_List.Add(WaterPlane_obj);
+
+                DragImage_obj = Instantiate(DragImage_Prefab, Vector3.zero, Quaternion.identity);
+                DragImage_obj.transform.SetParent(DragImage_Parent.transform);
             }
 
 
             if (Input.GetMouseButton(1)) // 드래그 중
             {              
+                //월드 오브젝트
                 nowPos = button_panel.GetMouseWorldPosition();
                 deltaX = Mathf.Abs(nowPos.x - startPos.x);
                 deltaZ = Mathf.Abs(nowPos.z - startPos.z);
                 deltaPos = startPos + (nowPos - startPos) / 2;
-                Drag_obj.transform.position = deltaPos;
-                Drag_obj.transform.localScale = new Vector3(deltaX, 10f, deltaZ);
+
+                //UI 오브젝트
+                nowPos_UI = Input.mousePosition;
+                deltaX_UI = Math.Abs(nowPos_UI.x - startPos_UI.x);
+                deltaY_UI = Math.Abs(nowPos_UI.y - startPos_UI.y);
+                deltaPos_UI = startPos_UI + (nowPos_UI - startPos_UI) / 2;
+
+
+                DragCollider_obj.transform.position = deltaPos;
+                DragCollider_obj.transform.localScale = new Vector3(deltaX, 10f, deltaZ);
+
+                WaterPlane_obj.transform.position = new Vector3(deltaPos.x, waterPlanePosY, deltaPos.z);
+                WaterPlane_obj.transform.localScale = new Vector3(DragCollider_obj.transform.localScale.x, 0.1f, DragCollider_obj.transform.localScale.z);
+
+                //이친구는 UI상 Image 오브젝트임
+                DragImage_obj.rectTransform.position = deltaPos_UI;
+                DragImage_obj.rectTransform.sizeDelta = new Vector2(deltaX_UI, deltaY_UI);         
+                    
             }
 
 
-           // Debug.Log(startPos + " / " + nowPos);
-            //if (Input.GetMouseButtonUp(0)) // 드래그가 끝나면 영역 사각형 삭제
-            //{
-            //    Destroy(square_Prefab);
-            //}
+
+            if (Input.GetMouseButtonUp(1)) // 드래그가 끝나면 영역 사각형 삭제
+            {
+                Destroy(DragImage_obj);
+            }
 
         }
 

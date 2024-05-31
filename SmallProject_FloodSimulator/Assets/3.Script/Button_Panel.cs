@@ -7,19 +7,17 @@ using TMPro;
 public class Button_Panel : MonoBehaviour
 {
     [SerializeField] Camera UI_Camera;
-    [SerializeField] Camera_Movement camera_movement;
-    [SerializeField] GameObject ManholeImage_Parent;
+    
+
     [SerializeField] GameObject Manhole_Parent;
 
-    [SerializeField] Button Manhole_Btn;
+    
     [SerializeField] GameObject Manhole_Prefab;     //맨홀 프리팹
-    [SerializeField] Image ManholeImage_Prefab;
-    [SerializeField] Image ManholeImage;
+   
     [SerializeField] List<Image> ManholeImage_List = null;
     [SerializeField] List<GameObject> Manhole_List = null;
 
-    [SerializeField] private bool bManholeBtnClicked = false;    //맨홀 설치 버튼 클릭 여부
-    private bool bCanManholeCreate = false;   //맨홀 생성이 가능한가 여부
+    
 
     [SerializeField] LayerMask ModelLayer;
     public Vector3 ClickPoint { get; private set; }
@@ -33,26 +31,15 @@ public class Button_Panel : MonoBehaviour
 
     private void Init()
     {
-        Manhole_Btn.onClick.AddListener(ManholeBtn_Clicked);
+       
         ManholeImage_List = new List<Image>();
         Manhole_List = new List<GameObject>();
     }
 
     private void Update()
     {
-        if(ManholeImage != null)
-        {
-            ManholeImage.rectTransform.position = Input.mousePosition;
-            bCanManholeCreate = true;
-        }
-        else
-        {
-            bCanManholeCreate = false;
-        }
-     
-
-
-        if (bCanManholeCreate && Input.GetMouseButtonDown(0))
+    
+        if (SystemManager.instance.bCanManholeCreate && Input.GetMouseButtonDown(0))
         {
             //bCanManholeCreate = false;
             //Image img = Instantiate(ManholeImage_Prefab, Vector3.zero, Quaternion.identity);
@@ -75,29 +62,7 @@ public class Button_Panel : MonoBehaviour
         }
     }
 
-    private void ManholeBtn_Clicked()
-    {
-        if(!bManholeBtnClicked)
-        {
-            //버튼이 안눌렸을 때
-            bManholeBtnClicked = true;
-            Manhole_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "일반모드";
-
-
-            //커서를 따라다니는 Prefab
-            ManholeImage = Instantiate(ManholeImage_Prefab, camera_movement.CurrentMousePos, Quaternion.identity);
-            ManholeImage.transform.SetParent(ManholeImage_Parent.transform);
-        }
-        else
-        {
-            //버튼이 눌렸을 때
-            bManholeBtnClicked = false;
-       
-            Manhole_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "맨홀 설치";
-            Destroy(ManholeImage);
-
-        }
-    }
+   
     
 
     //Perspective 카메라 - 마우스 위치 보정
@@ -123,5 +88,7 @@ public class Button_Panel : MonoBehaviour
 
         return Vector3.zero;
     }
+
+
 
 }

@@ -8,6 +8,8 @@ TagManager:
   - Ground
   - test
   - Building
+  - Manhole
+  - DragBox
   layers:
   - Default
   - TransparentFX
