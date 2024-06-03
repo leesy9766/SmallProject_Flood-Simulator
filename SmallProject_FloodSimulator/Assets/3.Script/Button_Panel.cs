@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class Button_Panel : MonoBehaviour
+//맨홀 설치
+public class Manhole_Placement : MonoBehaviour
 {
     [SerializeField] Camera UI_Camera;
     
@@ -40,25 +41,24 @@ public class Button_Panel : MonoBehaviour
     {
     
         if (SystemManager.instance.bCanManholeCreate && Input.GetMouseButtonDown(0))
-        {
-            //bCanManholeCreate = false;
-            //Image img = Instantiate(ManholeImage_Prefab, Vector3.zero, Quaternion.identity);
-            //img.rectTransform.position = Input.mousePosition;
-            //img.transform.SetParent(ManholeImage_Parent.transform);
-            //ManholeImage_List.Add(img);   
-
+        { 
 
             ClickPoint = GetMouseWorldPosition();          
             if (Physics.Raycast(ClickPoint, transform.up * -1, out hit, Mathf.Infinity, ModelLayer))
             {
                 Debug.Log("hit point : " + hit.point + "/" + ClickPoint);
-                GameObject obj = Instantiate(Manhole_Prefab, hit.point, Quaternion.identity);
 
-                obj.transform.SetParent(Manhole_Parent.transform);
-                Manhole_List.Add(obj);
+                Debug.Log(hit.transform.gameObject);
+
+                if(hit.transform.gameObject.CompareTag("Ground"))
+                {
+                    GameObject obj = Instantiate(Manhole_Prefab, hit.point, Quaternion.identity);
+                    obj.transform.SetParent(Manhole_Parent.transform);
+                    SystemManager.instance.ManholeObj_List.Add(obj);
+                }
+          
             }
-     
-
+    
         }
     }
 
@@ -78,12 +78,13 @@ public class Button_Panel : MonoBehaviour
         }
         else
         {
-            // 기본적으로 평면과의 교차를 계산
-            Plane plane = new Plane(Vector3.up, new Vector3(0, UI_Camera.transform.position.y - 10f, 0)); ;
-            if (plane.Raycast(ray, out float distance))
-            {
-                return ray.GetPoint(distance);
-            }
+           
+            //// 기본적으로 평면과의 교차를 계산
+            //Plane plane = new Plane(Vector3.up, new Vector3(0, UI_Camera.transform.position.y - 10f, 0)); ;
+            //if (plane.Raycast(ray, out float distance))
+            //{
+            //    return ray.GetPoint(distance);
+            //}
         }
 
         return Vector3.zero;

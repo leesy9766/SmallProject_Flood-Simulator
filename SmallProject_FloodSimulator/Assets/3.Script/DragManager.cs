@@ -9,7 +9,7 @@ public class DragManager : MonoBehaviour
     //마우스 우클릭으로 드래그앤 드롭 시 지역 선택되는 드래그 매니저
 
     [Header("ETC")]
-    [SerializeField] Button_Panel button_panel;
+    [SerializeField] Manhole_Placement manhole_Placement;
     [SerializeField] private Camera UI_Camera;
 
 
@@ -62,65 +62,83 @@ public class DragManager : MonoBehaviour
 
     private void Update()
     {
-        if(bcanDrag)
+        if (SystemManager.instance.view == SystemManager.ViewMode.UIView)
         {
-            if (Input.GetMouseButtonDown(1))
+            if (bcanDrag)
             {
-                //클릭한 순간 오브젝트 Instancitate(), position은 startpos와 nowpos의 중간좌표
-                startPos = button_panel.GetMouseWorldPosition();
-                startPos_UI = Input.mousePosition;
-                
-                Debug.Log(startPos);
+                if (Input.GetMouseButtonDown(1))
+                {
+                    //클릭한 순간 오브젝트 Instancitate(), position은 startpos와 nowpos의 중간좌표
+                    startPos = manhole_Placement.GetMouseWorldPosition();
+                    startPos_UI = Input.mousePosition;
 
-                DragCollider_obj = Instantiate(DragCollider_Prefab, startPos, Quaternion.identity);
-                DragCollider_obj.transform.SetParent(DragCollider_Parent.transform);
-                SystemManager.instance.DragObj_List.Add(DragCollider_obj);
+                    Debug.Log(startPos);
 
-                WaterPlane_obj = Instantiate(WaterPlane_Prefab, new Vector3(startPos.x, waterPlanePosY, startPos.z), Quaternion.identity);
-                WaterPlane_obj.transform.SetParent(WaterPlane_Parent.transform);
-                SystemManager.instance.WaterPlaneObj_List.Add(WaterPlane_obj);
+                    DragCollider_obj = Instantiate(DragCollider_Prefab, startPos, Quaternion.identity);
+                    DragCollider_obj.transform.SetParent(DragCollider_Parent.transform);
+                    SystemManager.instance.DragObj_List.Add(DragCollider_obj);
 
-                DragImage_obj = Instantiate(DragImage_Prefab, Vector3.zero, Quaternion.identity);
-                DragImage_obj.transform.SetParent(DragImage_Parent.transform);
+                    //WaterPlane_obj = Instantiate(WaterPlane_Prefab, new Vector3(startPos.x, waterPlanePosY, startPos.z), Quaternion.identity);
+                    //WaterPlane_obj.transform.SetParent(WaterPlane_Parent.transform);
+                    //SystemManager.instance.WaterPlaneObj_List.Add(WaterPlane_obj);
+
+                    DragImage_obj = Instantiate(DragImage_Prefab, Vector3.zero, Quaternion.identity);
+                    DragImage_obj.transform.SetParent(DragImage_Parent.transform);
+                }
+
+
+                if (Input.GetMouseButton(1)) // 드래그 중
+                {
+                    //월드 오브젝트
+                    nowPos = manhole_Placement.GetMouseWorldPosition();
+                    deltaX = Mathf.Abs(nowPos.x - startPos.x);
+                    deltaZ = Mathf.Abs(nowPos.z - startPos.z);
+                    deltaPos = startPos + (nowPos - startPos) / 2;
+
+                    //UI 오브젝트
+                    nowPos_UI = Input.mousePosition;
+                    deltaX_UI = Math.Abs(nowPos_UI.x - startPos_UI.x);
+                    deltaY_UI = Math.Abs(nowPos_UI.y - startPos_UI.y);
+                    deltaPos_UI = startPos_UI + (nowPos_UI - startPos_UI) / 2;
+
+
+                    DragCollider_obj.transform.position = new Vector3(deltaPos.x, 0f, deltaPos.z);      //deltaPos;
+                    DragCollider_obj.transform.localScale = new Vector3(deltaX, 50f, deltaZ);
+
+                    //WaterPlane_obj.transform.position = new Vector3(DragCollider_obj.transform.position.x, waterPlanePosY, DragCollider_obj.transform.position.z);
+                    //WaterPlane_obj.transform.localScale = new Vector3(DragCollider_obj.transform.localScale.x, 0.1f, DragCollider_obj.transform.localScale.z);
+
+                    //이친구는 UI상 Image 오브젝트임
+                    DragImage_obj.rectTransform.position = deltaPos_UI;
+                    DragImage_obj.rectTransform.sizeDelta = new Vector2(deltaX_UI, deltaY_UI);
+
+                }
+
+
+
+                if (Input.GetMouseButtonUp(1)) // 드래그가 끝나면 영역 사각형 삭제
+                {
+                    Destroy(DragImage_obj);
+                }
             }
-
-
-            if (Input.GetMouseButton(1)) // 드래그 중
-            {              
-                //월드 오브젝트
-                nowPos = button_panel.GetMouseWorldPosition();
-                deltaX = Mathf.Abs(nowPos.x - startPos.x);
-                deltaZ = Mathf.Abs(nowPos.z - startPos.z);
-                deltaPos = startPos + (nowPos - startPos) / 2;
-
-                //UI 오브젝트
-                nowPos_UI = Input.mousePosition;
-                deltaX_UI = Math.Abs(nowPos_UI.x - startPos_UI.x);
-                deltaY_UI = Math.Abs(nowPos_UI.y - startPos_UI.y);
-                deltaPos_UI = startPos_UI + (nowPos_UI - startPos_UI) / 2;
-
-
-                DragCollider_obj.transform.position = new Vector3(deltaPos.x, 0f, deltaPos.z);      //deltaPos;
-                DragCollider_obj.transform.localScale = new Vector3(deltaX, 20f, deltaZ);
-
-                WaterPlane_obj.transform.position = new Vector3(deltaPos.x, waterPlanePosY, deltaPos.z);
-                WaterPlane_obj.transform.localScale = new Vector3(DragCollider_obj.transform.localScale.x, 0.1f, DragCollider_obj.transform.localScale.z);
-
-                //이친구는 UI상 Image 오브젝트임
-                DragImage_obj.rectTransform.position = deltaPos_UI;
-                DragImage_obj.rectTransform.sizeDelta = new Vector2(deltaX_UI, deltaY_UI);         
-                    
-            }
-
-
-
-            if (Input.GetMouseButtonUp(1)) // 드래그가 끝나면 영역 사각형 삭제
-            {
-                Destroy(DragImage_obj);
-            }
+        
 
         }
 
     }
 
+
+
+    public void Instanciate_WaterPlane()
+    {
+        for(int i = 0; i<SystemManager.instance.DragObj_List.Count; i++)
+        {
+            WaterPlane_obj = Instantiate(WaterPlane_Prefab, Vector3.zero, Quaternion.identity);
+            WaterPlane_obj.transform.position = new Vector3(SystemManager.instance.DragObj_List[i].transform.position.x, waterPlanePosY, SystemManager.instance.DragObj_List[i].transform.position.z);
+            WaterPlane_obj.transform.localScale = new Vector3(SystemManager.instance.DragObj_List[i].transform.localScale.x, 0.1f, SystemManager.instance.DragObj_List[i].transform.localScale.z);
+            WaterPlane_obj.transform.SetParent(WaterPlane_Parent.transform);
+            SystemManager.instance.WaterPlaneObj_List.Add(WaterPlane_obj);
+        }
+
+    }
 }

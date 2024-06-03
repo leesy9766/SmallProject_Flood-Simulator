@@ -21,8 +21,9 @@ public class Manhole : MonoBehaviour
         if(other.CompareTag("Manhole"))
         {
             Debug.Log("설치 불가 위치");
-            Destroy(this);
             other.GetComponent<Manhole_Checker>().Manhole_List.Remove(this);
+            Destroy(this);
+           
         }
     }
 

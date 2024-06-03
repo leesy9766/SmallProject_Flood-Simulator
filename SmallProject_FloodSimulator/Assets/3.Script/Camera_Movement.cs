@@ -4,7 +4,14 @@ using UnityEngine;
 
 public class Camera_Movement : MonoBehaviour
 {
-    [SerializeField] private Camera UI_Camera;
+    enum Mode
+    {
+        SimulationView = 0,
+        UIView
+    }
+    Mode mode;
+
+    //[SerializeField] private Camera UI_Camera;
 
     //카메라 기뵌 위치 및 최대 최소 촬영 범위---------------------------------
     [SerializeField] private Vector3 BasicPos_Ortho = new Vector3(80f, 485f, 0f);
@@ -23,7 +30,7 @@ public class Camera_Movement : MonoBehaviour
     private Vector3 previous_MousePos;
     private Vector3 current_MousePos;
 
-    
+
 
 
     //[SerializeField] private float rotCamXAxisSpeed = 5f; // 카메라 x축 회전속도
@@ -46,134 +53,128 @@ public class Camera_Movement : MonoBehaviour
 
     private void Awake()
     {
-        UI_Camera = gameObject.GetComponent<Camera>();
+        // UI_Camera = gameObject.GetComponent<Camera>();
+
     }
 
 
     private void Start()
     {
-        Init();   
+        Init();
     }
 
 
     private void Update()
     {
-        //Input.MousePos - 스크린포인트..
-        CurrentMousePosX = UI_Camera.ScreenToWorldPoint(Input.mousePosition).x;
-        CurrentMousePosY = UI_Camera.ScreenToWorldPoint(Input.mousePosition).y;
-        CurrentMousePos = new Vector2(CurrentMousePosX, CurrentMousePosY);
-
-       
 
         #region Zoom In/Out by mouse
         //카메라의 Field of View값/Size값 변경
 
-        if (UI_Camera.orthographic)
+        if (SystemManager.instance.UseCamera.orthographic)
         {
             MouseWheelInput = Input.mouseScrollDelta;
-            if (MouseWheelInput.y > 0 && UI_Camera.orthographicSize >= MinFieldofView)
+            if (MouseWheelInput.y > 0 && SystemManager.instance.UseCamera.orthographicSize >= MinFieldofView)
             {
                 //줌인
                 Debug.Log("줌..!인..!!!!!");
-                UI_Camera.orthographicSize -= 5f;
+                SystemManager.instance.UseCamera.orthographicSize -= 5f;
 
             }
-            else if (MouseWheelInput.y < 0 && UI_Camera.orthographicSize <= MaxFieldofView)
+            else if (MouseWheelInput.y < 0 && SystemManager.instance.UseCamera.orthographicSize <= MaxFieldofView)
             {
                 //줌아웃
                 Debug.Log("줌..!아웃..!!!!!");
-                UI_Camera.orthographicSize += 5f;
+                SystemManager.instance.UseCamera.orthographicSize += 5f;
             }
 
         }
         else
         {
-
             MouseWheelInput = Input.mouseScrollDelta;
-            if (MouseWheelInput.y > 0 && UI_Camera.fieldOfView >= 2f)
+            if (MouseWheelInput.y > 0 && SystemManager.instance.UseCamera.fieldOfView >= 2f)
             {
-                UI_Camera.transform.position = UI_Camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, UI_Camera.transform.position.y, Input.mousePosition.z));
+                SystemManager.instance.UseCamera.transform.position = SystemManager.instance.UseCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, SystemManager.instance.UseCamera.transform.position.y, Input.mousePosition.z));
                 Debug.Log("줌..!인..!!!!!");
-                UI_Camera.fieldOfView -= 2.5f;
+                SystemManager.instance.UseCamera.fieldOfView -= 2.5f;
             }
-            else if (MouseWheelInput.y < 0 && UI_Camera.fieldOfView <= 60f)
+            else if (MouseWheelInput.y < 0 && SystemManager.instance.UseCamera.fieldOfView <= 60f)
             {
                 //UI_Camera.transform.position = new Vector3(Input.mousePosition.x, UI_Camera.transform.position.y, Input.mousePosition.z);
                 Debug.Log("줌..!아웃..!!!!!");
-                UI_Camera.fieldOfView += 2.5f;
+                SystemManager.instance.UseCamera.fieldOfView += 2.5f;
             }
         }
 
 
         #endregion
+
+
+
+
+        //Input.MousePos - 스크린포인트..
+        CurrentMousePosX = SystemManager.instance.UseCamera.ScreenToWorldPoint(Input.mousePosition).x;
+        CurrentMousePosY = SystemManager.instance.UseCamera.ScreenToWorldPoint(Input.mousePosition).y;
+        CurrentMousePos = new Vector2(CurrentMousePosX, CurrentMousePosY);
 
 
 
         #region Movement by keyboard
         if (Input.GetKey(KeyCode.W))
         {
-            UI_Camera.transform.position += Vector3.forward;
+            SystemManager.instance.UseCamera.transform.position += Vector3.forward;
         }
-        else if(Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(KeyCode.S))
         {
-            UI_Camera.transform.position += Vector3.back;
+            SystemManager.instance.UseCamera.transform.position += Vector3.back;
         }
-        else if(Input.GetKey(KeyCode.A))
+        else if (Input.GetKey(KeyCode.A))
         {
-            UI_Camera.transform.position += Vector3.left;
+            SystemManager.instance.UseCamera.transform.position += Vector3.left;
         }
-        else if(Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.D))
         {
-            UI_Camera.transform.position += Vector3.right;
+            SystemManager.instance.UseCamera.transform.position += Vector3.right;
         }
 
         #endregion
 
 
 
-        //#region rotation by mouse
+        #region rotation by mouse
+        if(SystemManager.instance.view == SystemManager.ViewMode.SimulationView)
+        {
+            if (Input.GetMouseButton(1))
+            {
+                UpdateRotate();
+            }
+        }
+  
+        #endregion
 
-        //if(Input.GetMouseButton(1))
-        //{
-        //    if(!rightclicked)
-        //    {
-        //        //우클릭 실행됨
-        //        previous_MousePos = UI_Camera.ScreenToWorldPoint(Input.mousePosition);  //첫 우클릭 시 한번만 update
-        //        rightclicked = true;
-        //    }
 
-            
-        //    UpdateRotate();
-        //}
 
-        //#endregion
+
     }
 
 
     private void Init()
     {
 
-        if (UI_Camera.orthographic)
+        if (SystemManager.instance.UseCamera.orthographic)
         {
-            UI_Camera.orthographicSize = 450f;
+            SystemManager.instance.UseCamera.orthographicSize = 450f;
         }
         else
         {
-            UI_Camera.fieldOfView = 60f;
+            SystemManager.instance.UseCamera.fieldOfView = 60f;
             //UI_Camera.transform.position = new Vector3(-35f, 798f, -11.6f);
             //UI_Camera.transform.rotation = Quaternion.Euler(90.7f, -179.5f, 180.8f);
-            UI_Camera.farClipPlane = 2000f;
+            SystemManager.instance.UseCamera.farClipPlane = 2000f;
         }
-     
+
     }
 
-    public void CalculateRotation(float mouseX, float mouseY)
-    {
-        eulerAngleY += mouseX * rotCamYAxisSpeed;
-        eulerAngleX -= mouseY * rotCamYAxisSpeed;
-      
-        transform.rotation = Quaternion.Euler(eulerAngleX, eulerAngleY, 0);
-    }
+
 
     // 카메라 x축 회전의 경우 회전 범위를 설정
     private float ClampAngle(float angle, float min, float max)
@@ -197,20 +198,31 @@ public class Camera_Movement : MonoBehaviour
         CalculateRotation(mouseX, mouseY);
     }
 
-
-    //처음으로 버튼누르면 카메라 위치 기본 상공으로 이동
-    public void Goto_Basic()
+    public void CalculateRotation(float mouseX, float mouseY)
     {
-        if (UI_Camera.orthographic)
+        eulerAngleY += mouseX * rotCamYAxisSpeed;
+        eulerAngleX -= mouseY * rotCamYAxisSpeed;
+
+        SystemManager.instance.UseCamera.transform.rotation = Quaternion.Euler(eulerAngleX, eulerAngleY, 0);
+    }
+    
+    public void ResetCamera_Pos()
+    {
+        SystemManager.instance.UseCamera = SystemManager.instance.UI_Camera;
+
+        if(SystemManager.instance.UI_Camera.orthographic)
         {
-            UI_Camera.transform.position = BasicPos_Ortho;
-            UI_Camera.transform.rotation = BasicRot_Ortho;
+            SystemManager.instance.UI_Camera.transform.position = BasicPos_Ortho;
+            SystemManager.instance.UI_Camera.transform.rotation = BasicRot_Ortho;
         }
         else
         {
-            UI_Camera.transform.position = BasicPos_Pers;
-            UI_Camera.transform.rotation = BasicRot_Pers;
+            SystemManager.instance.UI_Camera.transform.position = BasicPos_Pers;
+            SystemManager.instance.UI_Camera.transform.rotation = BasicRot_Pers;
         }
-       
+
+        Camera.main.transform.position = new Vector3(72f, 47f, -390f);
+        Camera.main.transform.rotation = Quaternion.Euler(154.8f, -174.8f, 180f);
     }
+
 }

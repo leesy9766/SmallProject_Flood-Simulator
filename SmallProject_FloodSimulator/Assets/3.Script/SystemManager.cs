@@ -6,7 +6,17 @@ public class SystemManager : MonoBehaviour
 {
     public static SystemManager instance = null;
 
+
+    public enum ViewMode
+    {
+        SimulationView = 0,
+        UIView
+    }
+    public ViewMode view;
+
+
     [SerializeField] public Camera UI_Camera;
+    public Camera UseCamera;
 
     public bool bSimulating = false;        //시뮬레이션 여부 (WaterPlane)이 움직이게 하는 변수
     public bool bManholeShow = false;       //맨홀위치 UI에 뜨도록 하는 변수
@@ -34,18 +44,22 @@ public class SystemManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-    }
 
-
-    private void Start()
-    {
         Init();
+
     }
 
 
 
     private void Init()
     {
+        Screen.SetResolution(1500, 1000, true);
+
+
+
+        UseCamera = UI_Camera;
+        view = ViewMode.UIView;
+
         WaterPlaneObj_List = new List<GameObject>();
         ManholeObj_List = new List<GameObject>(); 
         DragObj_List = new List<GameObject>();
