@@ -2,10 +2,20 @@ using UnityEngine;
 
 public class Manhole : MonoBehaviour
 {
+    [Header("물이 수용되는 양")]
     public float CurrentWaterStrage = 0f;
-    public float MaxWaterStarage;
+    public float MaxWaterStarage = 5f;
+
+    [Header("시간당 역류하는 물")]
+    public float FloodWaterByTime = 5f; 
+
     [SerializeField] public bool isCounted { get; private set; } = false;
 
+
+    private void Start()
+    {
+        CurrentWaterStrage = 0f;
+    }
 
 
     private void OnTriggerEnter(Collider other)

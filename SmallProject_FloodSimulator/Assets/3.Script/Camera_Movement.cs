@@ -2,14 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+//카메라를 이동시키면서 다바꾸긴 귀찮으니까..두개를 씁시다..
 public class Camera_Movement : MonoBehaviour
 {
-    enum Mode
+    #region Variable
+    private enum Mode
     {
         SimulationView = 0,
         UIView
     }
-    Mode mode;
+
+    private Mode mode;
 
     //[SerializeField] private Camera UI_Camera;
 
@@ -26,38 +30,34 @@ public class Camera_Movement : MonoBehaviour
     private float MinFieldofView = 10f;
 
 
-    //카메라 회전관련------- ---------------------------------------------------
+    //카메라 회전관련----------------------------------------------------------
     private Vector3 previous_MousePos;
     private Vector3 current_MousePos;
 
-
-
-
-    //[SerializeField] private float rotCamXAxisSpeed = 5f; // 카메라 x축 회전속도
-    [SerializeField] private float rotCamYAxisSpeed = 3f; // 카메라 y축 회전속도
+    private float limitMinX = -50f;
+    private float limitMaxX = 50f;
+  
+    [SerializeField] private float rotCamAxisSpeed = 3f; // 카메라 y축 회전속도
 
     private float eulerAngleX; // 마우스 좌 / 우 이동으로 카메라 y축 회전
     private float eulerAngleY; // 마우스 위 / 아래 이동으로 카메라 x축 회전
 
-
+    //카메라 이동 관련----------------------------------------------------------
+    private float horizontal, vertical;
+    public float moveSpeed = 20f;
 
     //마우스 관련 --------------------------------------------------------------
     [SerializeField] public Vector2 CurrentMousePos;
     [SerializeField] private float CurrentMousePosX;
-    [SerializeField] private float CurrentMousePosY;   //Y라곤 적었지만 3D상 Z값으로 연산하기 ㅇ.<
+    [SerializeField] private float CurrentMousePosY;  
+
 
     //private float MouseWheelInput = 0f;
     private Vector2 MouseWheelInput;
+    #endregion
 
 
-
-    private void Awake()
-    {
-        // UI_Camera = gameObject.GetComponent<Camera>();
-
-    }
-
-
+    #region Unity Event
     private void Start()
     {
         Init();
@@ -108,54 +108,44 @@ public class Camera_Movement : MonoBehaviour
 
         #endregion
 
-
-
-
+        #region MousePoint
         //Input.MousePos - 스크린포인트..
         CurrentMousePosX = SystemManager.instance.UseCamera.ScreenToWorldPoint(Input.mousePosition).x;
         CurrentMousePosY = SystemManager.instance.UseCamera.ScreenToWorldPoint(Input.mousePosition).y;
         CurrentMousePos = new Vector2(CurrentMousePosX, CurrentMousePosY);
-
-
-
-        #region Movement by keyboard
-        if (Input.GetKey(KeyCode.W))
-        {
-            SystemManager.instance.UseCamera.transform.position += Vector3.forward;
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            SystemManager.instance.UseCamera.transform.position += Vector3.back;
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            SystemManager.instance.UseCamera.transform.position += Vector3.left;
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            SystemManager.instance.UseCamera.transform.position += Vector3.right;
-        }
-
         #endregion
 
+        #region Movement by keyboard
+        horizontal = Input.GetAxis("Horizontal");
+        vertical =  Input.GetAxis("Vertical");
+        Vector3 dir = new Vector3(horizontal, 0, vertical);
 
+        if (!(horizontal == 0 && vertical == 0))
+        {
+            Vector3 move = SystemManager.instance.UseCamera.transform.TransformDirection(transform.forward * vertical + transform.right * horizontal);
+            SystemManager.instance.UseCamera.transform.position += move * Time.deltaTime * moveSpeed;
+        }
+        #endregion
 
         #region rotation by mouse
-        if(SystemManager.instance.view == SystemManager.ViewMode.SimulationView)
+        if (SystemManager.instance.view == SystemManager.ViewMode.SimulationView)
         {
             if (Input.GetMouseButton(1))
             {
                 UpdateRotate();
+
             }
         }
-  
+
         #endregion
-
-
-
 
     }
 
+    #endregion
+
+
+
+    #region Method
 
     private void Init()
     {
@@ -172,11 +162,11 @@ public class Camera_Movement : MonoBehaviour
             SystemManager.instance.UseCamera.farClipPlane = 2000f;
         }
 
+        moveSpeed = 20f;
+
     }
 
 
-
-    // 카메라 x축 회전의 경우 회전 범위를 설정
     private float ClampAngle(float angle, float min, float max)
     {
         if (angle < -360)
@@ -198,14 +188,16 @@ public class Camera_Movement : MonoBehaviour
         CalculateRotation(mouseX, mouseY);
     }
 
+
     public void CalculateRotation(float mouseX, float mouseY)
     {
-        eulerAngleY += mouseX * rotCamYAxisSpeed;
-        eulerAngleX -= mouseY * rotCamYAxisSpeed;
-
+        eulerAngleY += mouseX * rotCamAxisSpeed;
+        eulerAngleX -= mouseY * rotCamAxisSpeed;
+        eulerAngleX = ClampAngle(eulerAngleX, limitMinX, limitMaxX);
         SystemManager.instance.UseCamera.transform.rotation = Quaternion.Euler(eulerAngleX, eulerAngleY, 0);
     }
     
+
     public void ResetCamera_Pos()
     {
         SystemManager.instance.UseCamera = SystemManager.instance.UI_Camera;
@@ -224,5 +216,7 @@ public class Camera_Movement : MonoBehaviour
         Camera.main.transform.position = new Vector3(72f, 47f, -390f);
         Camera.main.transform.rotation = Quaternion.Euler(154.8f, -174.8f, 180f);
     }
+
+    #endregion
 
 }

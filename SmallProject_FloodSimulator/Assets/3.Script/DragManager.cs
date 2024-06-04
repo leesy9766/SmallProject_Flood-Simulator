@@ -78,10 +78,6 @@ public class DragManager : MonoBehaviour
                     DragCollider_obj.transform.SetParent(DragCollider_Parent.transform);
                     SystemManager.instance.DragObj_List.Add(DragCollider_obj);
 
-                    //WaterPlane_obj = Instantiate(WaterPlane_Prefab, new Vector3(startPos.x, waterPlanePosY, startPos.z), Quaternion.identity);
-                    //WaterPlane_obj.transform.SetParent(WaterPlane_Parent.transform);
-                    //SystemManager.instance.WaterPlaneObj_List.Add(WaterPlane_obj);
-
                     DragImage_obj = Instantiate(DragImage_Prefab, Vector3.zero, Quaternion.identity);
                     DragImage_obj.transform.SetParent(DragImage_Parent.transform);
                 }
@@ -89,26 +85,22 @@ public class DragManager : MonoBehaviour
 
                 if (Input.GetMouseButton(1)) // 드래그 중
                 {
-                    //월드 오브젝트
+                    //월드 오브젝트 포지션
                     nowPos = manhole_Placement.GetMouseWorldPosition();
                     deltaX = Mathf.Abs(nowPos.x - startPos.x);
                     deltaZ = Mathf.Abs(nowPos.z - startPos.z);
                     deltaPos = startPos + (nowPos - startPos) / 2;
 
-                    //UI 오브젝트
+                    //UI 오브젝트 포지션
                     nowPos_UI = Input.mousePosition;
                     deltaX_UI = Math.Abs(nowPos_UI.x - startPos_UI.x);
                     deltaY_UI = Math.Abs(nowPos_UI.y - startPos_UI.y);
                     deltaPos_UI = startPos_UI + (nowPos_UI - startPos_UI) / 2;
 
-
                     DragCollider_obj.transform.position = new Vector3(deltaPos.x, 0f, deltaPos.z);      //deltaPos;
                     DragCollider_obj.transform.localScale = new Vector3(deltaX, 50f, deltaZ);
 
-                    //WaterPlane_obj.transform.position = new Vector3(DragCollider_obj.transform.position.x, waterPlanePosY, DragCollider_obj.transform.position.z);
-                    //WaterPlane_obj.transform.localScale = new Vector3(DragCollider_obj.transform.localScale.x, 0.1f, DragCollider_obj.transform.localScale.z);
-
-                    //이친구는 UI상 Image 오브젝트임
+                    //캔버스의 Drag Image
                     DragImage_obj.rectTransform.position = deltaPos_UI;
                     DragImage_obj.rectTransform.sizeDelta = new Vector2(deltaX_UI, deltaY_UI);
 
@@ -137,7 +129,7 @@ public class DragManager : MonoBehaviour
             WaterPlane_obj.transform.position = new Vector3(SystemManager.instance.DragObj_List[i].transform.position.x, waterPlanePosY, SystemManager.instance.DragObj_List[i].transform.position.z);
             WaterPlane_obj.transform.localScale = new Vector3(SystemManager.instance.DragObj_List[i].transform.localScale.x, 0.1f, SystemManager.instance.DragObj_List[i].transform.localScale.z);
             WaterPlane_obj.transform.SetParent(WaterPlane_Parent.transform);
-            SystemManager.instance.WaterPlaneObj_List.Add(WaterPlane_obj);
+            SystemManager.instance.WaterPlaneObj_List.Add(WaterPlane_obj.GetComponent<WaterPlane>());
         }
 
     }

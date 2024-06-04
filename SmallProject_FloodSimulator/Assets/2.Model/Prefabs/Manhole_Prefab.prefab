@@ -128,3 +128,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8156562737dab3644ac4af3d2bfae61a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CurrentWaterStrage: 0
+  MaxWaterStarage: 5
+  FloodWaterByTime: 5

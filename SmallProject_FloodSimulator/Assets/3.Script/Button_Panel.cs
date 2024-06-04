@@ -18,7 +18,6 @@ public class Manhole_Placement : MonoBehaviour
     [SerializeField] List<Image> ManholeImage_List = null;
     [SerializeField] List<GameObject> Manhole_List = null;
 
-    
 
     [SerializeField] LayerMask ModelLayer;
     public Vector3 ClickPoint { get; private set; }

@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+//귀찮으니 일단 전역..싱글턴..
 public class SystemManager : MonoBehaviour
 {
     public static SystemManager instance = null;
@@ -24,13 +26,17 @@ public class SystemManager : MonoBehaviour
     public float simulationTime = 10f;
     public float currentTime = 0f;
 
-    public List<GameObject> WaterPlaneObj_List = null;
+    public List<WaterPlane> WaterPlaneObj_List = null;
     public List<GameObject> DragObj_List = null;
     public List<GameObject> ManholeObj_List = null;
 
     //드래그 영역 안에 있는 맨홀들 : Drag Collider의 맨홀 List를 관리하는 List -> 이중리스트
     public List<List<Manhole>> ManholeDragArea_List = null;
+    public List<Manhole_Checker> ManholeCheckers_List = null;
 
+    public List<float> TEST_LIST = null;
+
+    //환경변수
     public float RainAmount = 0f;
 
     private void Awake()
@@ -60,10 +66,12 @@ public class SystemManager : MonoBehaviour
         UseCamera = UI_Camera;
         view = ViewMode.UIView;
 
-        WaterPlaneObj_List = new List<GameObject>();
+        WaterPlaneObj_List = new List<WaterPlane>();
         ManholeObj_List = new List<GameObject>(); 
         DragObj_List = new List<GameObject>();
-        ManholeDragArea_List = new List<List<Manhole>>(); 
+        ManholeDragArea_List = new List<List<Manhole>>();
+        ManholeCheckers_List = new List<Manhole_Checker>();
+        TEST_LIST = new List<float>();
     }
         
 
@@ -88,9 +96,31 @@ public class SystemManager : MonoBehaviour
         }
     }
 
-    //맨홀 드래그 리스트 가져오는 함수
-    public void GetManholeInDragArea()
+
+    public void Flooding()
     {
+        for(int i = 0; i< DragObj_List.Count; i++)
+        {
+            Manhole_Checker checker = new Manhole_Checker();
+            checker = DragObj_List[i].GetComponent<Manhole_Checker>();
+            //ManholeCheckers_List.Add(checker);
+
+            for (int j = 0; j< checker.Manhole_List.Count; j++)
+            {
+                WaterPlaneObj_List[i].StorageAmount += checker.Manhole_List[j].MaxWaterStarage;
+                WaterPlaneObj_List[i].ManholeCount += 1;
+            }
+
+
+            TEST_LIST.Add(WaterPlaneObj_List[i].StorageAmount);
+            
+        }
+
+
+
+    
+
+
 
     }
 }

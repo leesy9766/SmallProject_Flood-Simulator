@@ -30,12 +30,6 @@ public class Button_Panel : MonoBehaviour
         Init();
     }
 
-    private void Init()
-    {
-       
-        ManholeImage_List = new List<Image>();
-        Manhole_List = new List<GameObject>();
-    }
 
     private void Update()
     {
@@ -62,8 +56,14 @@ public class Button_Panel : MonoBehaviour
         }
     }
 
-   
-    
+
+    private void Init()
+    {
+
+        ManholeImage_List = new List<Image>();
+        Manhole_List = new List<GameObject>();
+    }
+
 
     //Perspective 카메라 - 마우스 위치 보정
     public Vector3 GetMouseWorldPosition()

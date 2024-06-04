@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
     [Header("강수량 입력창")]
     [SerializeField] private TMP_InputField RainAmount_InputField;
     [SerializeField] private Button Confirm_Btn;
+    [SerializeField] private TMP_Text Number_Text;
 
     [Header("버튼")]
     [SerializeField] private Button Manhole_Btn;
@@ -100,6 +101,13 @@ public class UIManager : MonoBehaviour
         currentTimeScale = 1;
         bPause = false;
         bDragAreaActive = true;
+
+        //UI 기본설정 -------------------------------------------------------------------
+        if(Number_Text.gameObject.activeSelf)
+        {
+            Number_Text.gameObject.SetActive(false);
+        }
+
       
     }
 
@@ -128,6 +136,12 @@ public class UIManager : MonoBehaviour
         {
             SystemManager.instance.RainAmount = int.Parse(RainAmount_InputField.text);
         }
+
+        Number_Text.text = SystemManager.instance.RainAmount.ToString() + " mm/s";
+
+        RainAmount_InputField.gameObject.SetActive(false);
+        Confirm_Btn.gameObject.SetActive(false);
+        Number_Text.gameObject.SetActive(true);
     }
 
     public void ResetBtn_Clicked()
@@ -151,6 +165,17 @@ public class UIManager : MonoBehaviour
         SystemManager.instance.ManholeObj_List.Clear();
 
         camera_movement.ResetCamera_Pos();
+
+        //UI오브젝트 ON/OFF
+        Number_Text.gameObject.SetActive(false);
+        Confirm_Btn.gameObject.SetActive(true);
+        RainAmount_InputField.gameObject.SetActive(true);
+        RainAmount_InputField.text = string.Empty;
+
+        //변수값 초기화
+        SystemManager.instance.RainAmount = 0f;
+
+
     }
 
     private void ManholeBtn_Clicked()
@@ -202,6 +227,7 @@ public class UIManager : MonoBehaviour
     private void SimulationBtn_Clicked()
     {
         dragManager.Instanciate_WaterPlane();
+        SystemManager.instance.Flooding();
     }
 
     private void ManholeShowBtn_Clicked()
@@ -237,7 +263,7 @@ public class UIManager : MonoBehaviour
     }
 
 
-    //to. 다음주의 나에게 - 알파값 되돌릴때 머티리얼 컬러 안돌아온다..고쳐라..
+    //to. 내일의 나에게 - 알파값 되돌릴때 머티리얼 컬러 안돌아온다..고쳐라..
     private void DragAreaBtn_Clicked()
     {
         //DragObject_List의 모든 원소의 Material의 알파값을 0 -> 일단 그냥 오브젝트 껏다..켯다..
