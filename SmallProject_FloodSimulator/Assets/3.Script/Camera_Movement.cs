@@ -44,7 +44,7 @@ public class Camera_Movement : MonoBehaviour
 
     //카메라 이동 관련----------------------------------------------------------
     private float horizontal, vertical;
-    public float moveSpeed = 40f;
+    private float moveSpeed = 100f;
 
     //마우스 관련 --------------------------------------------------------------
     [SerializeField] public Vector2 CurrentMousePos;
@@ -123,7 +123,7 @@ public class Camera_Movement : MonoBehaviour
         if (!(horizontal == 0 && vertical == 0))
         {
             Vector3 move = SystemManager.instance.UseCamera.transform.TransformDirection(transform.forward * vertical + transform.right * horizontal);
-            SystemManager.instance.UseCamera.transform.position += move * Time.deltaTime * moveSpeed;
+            SystemManager.instance.UseCamera.transform.position += move * Time.unscaledDeltaTime * moveSpeed;
         }
         #endregion
 
@@ -201,7 +201,7 @@ public class Camera_Movement : MonoBehaviour
     {
         SystemManager.instance.UseCamera = SystemManager.instance.UI_Camera;
 
-        if(SystemManager.instance.UI_Camera.orthographic)
+        if(!SystemManager.instance.UI_Camera.orthographic)
         {
             SystemManager.instance.UI_Camera.transform.position = BasicPos_Ortho;
             SystemManager.instance.UI_Camera.transform.rotation = BasicRot_Ortho;
@@ -215,6 +215,8 @@ public class Camera_Movement : MonoBehaviour
         Camera.main.transform.position = new Vector3(72f, 47f, -390f);
         Camera.main.transform.rotation = Quaternion.Euler(154.8f, -174.8f, 180f);
     }
+
+    
 
     #endregion
 

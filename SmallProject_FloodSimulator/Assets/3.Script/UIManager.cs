@@ -10,20 +10,25 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Camera_Movement camera_movement;
     [SerializeField] private DragManager dragManager;
 
+    [Header("패널")]
+    [SerializeField] private GameObject Warning_Panel;
+
     [Header("강수량 입력창")]
     [SerializeField] private TMP_InputField RainAmount_InputField;
     [SerializeField] private Button Confirm_Btn;
     [SerializeField] private TMP_Text Number_Text;
+    [SerializeField] private Button Simulation_Btn;
 
     [Header("버튼")]
     [SerializeField] private Button Manhole_Btn;
     [SerializeField] private Button Reset_Btn;
-    [SerializeField] private Button Simulation_Btn;
     [SerializeField] private Button ViewMode_Btn;
     [SerializeField] private Button ManholeShow_Btn;
     [SerializeField] private Button DragArea_Btn;
+    [SerializeField] private Button WaterArea_Btn;
+    [SerializeField] private Button BuildingColor_Btn;
     [SerializeField] private Button PlaySpeed_Btn;
-    [SerializeField] private Button Pause_Btn;
+    [SerializeField] private Button Exit_Btn;
   
     [Header("맨홀 설치 커서")]
     [SerializeField] GameObject ManholeImage_Parent;
@@ -76,24 +81,36 @@ public class UIManager : MonoBehaviour
     private void Init()
     {
         //카메라 컴포넌트------------------------------------------------------------------
-       
+
 
         //버튼 이벤트 메소드 연결-----------------------------------------------------------
-        Confirm_Btn.onClick.AddListener(ConfirmBtn_Clicked);
-        Reset_Btn.onClick.AddListener(ResetBtn_Clicked);
+        //우측 상단
         Simulation_Btn.onClick.AddListener(SimulationBtn_Clicked);
+        Confirm_Btn.onClick.AddListener(ConfirmBtn_Clicked);
+
+        //좌측패널
+        Reset_Btn.onClick.AddListener(ResetBtn_Clicked);
         Manhole_Btn.onClick.AddListener(ManholeBtn_Clicked);
         ViewMode_Btn.onClick.AddListener(ViewModeBtn_Clicked);
         ManholeShow_Btn.onClick.AddListener(ManholeShowBtn_Clicked);
         DragArea_Btn.onClick.AddListener(DragAreaBtn_Clicked);
+        WaterArea_Btn.onClick.AddListener(WaterAreaBtn_Clicked);
+        BuildingColor_Btn.onClick.AddListener(BuildingColorBtn_Clicked);
         PlaySpeed_Btn.onClick.AddListener(PlaySpeedBtn_Clicked);
-        Pause_Btn.onClick.AddListener(PauseBtn_Clicked);
+        Exit_Btn.onClick.AddListener(ExitProgram);
+
 
         //배속 속도 관련------------------------------------------------------------------
         PlaySpeed_Image = PlaySpeed_Btn.transform.GetChild(0).GetComponent<Image>();
         PlaySpeed_Text = PlaySpeed_Btn.transform.GetChild(1).GetComponent<TMP_Text>();
 
+        Setting();
+    
+    }
 
+    //변수 세팅 함수 -> 시작 및 초기화 시 사용
+    private void Setting()
+    {
         //변수 기본 설정-------------------------------------------------------------------
         playSpeed = PlaySpeed.x1;
         PlaySpeed_Image.sprite = SpeedImageSprite_Arr[0];
@@ -102,14 +119,22 @@ public class UIManager : MonoBehaviour
         bPause = false;
         bDragAreaActive = true;
 
+        Simulation_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "시뮬레이션\n시작";
+
         //UI 기본설정 -------------------------------------------------------------------
-        if(Number_Text.gameObject.activeSelf)
+        if (Number_Text.gameObject.activeSelf)
         {
             Number_Text.gameObject.SetActive(false);
+            RainAmount_InputField.gameObject.SetActive(true);
+        }
+        if(Warning_Panel.activeSelf)
+        {
+            Warning_Panel.SetActive(false);
         }
 
-      
+        SystemManager.instance.InitBuildingColor();
     }
+
 
     private void Update()
     {
@@ -146,7 +171,15 @@ public class UIManager : MonoBehaviour
 
     public void ResetBtn_Clicked()
     {
-        for(int i = 0; i<SystemManager.instance.DragObj_List.Count; i++)
+
+        //변수값 초기화
+        SystemManager.instance.bSimulating = false;
+        SystemManager.instance.RainAmount = 0f;
+
+        Setting();
+
+        //리스트 초기화
+        for (int i = 0; i<SystemManager.instance.DragObj_List.Count; i++)
         {
             Destroy(SystemManager.instance.DragObj_List[i].gameObject);           
         }
@@ -172,8 +205,7 @@ public class UIManager : MonoBehaviour
         RainAmount_InputField.gameObject.SetActive(true);
         RainAmount_InputField.text = string.Empty;
 
-        //변수값 초기화
-        SystemManager.instance.RainAmount = 0f;
+  
 
 
     }
@@ -224,8 +256,31 @@ public class UIManager : MonoBehaviour
 
     private void SimulationBtn_Clicked()
     {
-        dragManager.Instanciate_WaterPlane();
-        SystemManager.instance.Flooding();
+        if (!SystemManager.instance.bSimulating)
+        {
+            //시뮬중이 아니면 -> 시뮬레이트 시작
+            SystemManager.instance.bSimulating = true;
+            bPause = false;
+            dragManager.Instanciate_WaterPlane();
+            SystemManager.instance.Flooding();
+
+            Simulation_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "시뮬레이션\n정지";
+        }
+        else
+        {
+            if (!bPause)
+            {
+                bPause = true;
+                Simulation_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "시뮬레이션\n재실행";
+                Time.timeScale = 0f;
+            }
+            else
+            {
+                bPause = false;
+                Simulation_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "시뮬레이션\n정지";
+                Time.timeScale = currentTimeScale;
+            }
+        }
     }
 
     private void ManholeShowBtn_Clicked()
@@ -274,8 +329,7 @@ public class UIManager : MonoBehaviour
             bDragAreaActive = false;
             for (int i = 0; i < SystemManager.instance.DragObj_List.Count; i++)
             {
-               
-
+              
                 SystemManager.instance.DragObj_List[i].gameObject.SetActive(false);
 
                 //SystemManager.instance.DragObj_List[i].GetComponent<MeshRenderer>().materials[0].color = new Color(255, 241, 81, 0);
@@ -297,7 +351,48 @@ public class UIManager : MonoBehaviour
       
     }
 
+    private void WaterAreaBtn_Clicked()
+    {
+        if(SystemManager.instance.bWaterAreaShow)
+        {
+            //침수효과가 켜져있으면 -> 끄기
+            SystemManager.instance.bWaterAreaShow = false;
 
+            for(int i=0; i < SystemManager.instance.WaterPlaneObj_List.Count; i++)
+            {
+                SystemManager.instance.WaterPlaneObj_List[i].GetComponent<MeshRenderer>().material = SystemManager.instance.Transparent_M;
+            }
+          
+            WaterArea_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "침수 효과\n켜기";
+        }
+        else
+        {
+            //침수효과가 꺼져있으면 -> 켜기
+            SystemManager.instance.bWaterAreaShow = true;
+
+            for (int i = 0; i < SystemManager.instance.WaterPlaneObj_List.Count; i++)
+            {
+                SystemManager.instance.WaterPlaneObj_List[i].GetComponent<MeshRenderer>().material = SystemManager.instance.Water_M;
+            }
+
+            WaterArea_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "침수 효과\n끄기";
+        }
+    }
+
+    private void BuildingColorBtn_Clicked()
+    {
+        if(SystemManager.instance.bColoredBuidlingShow)
+        {
+            SystemManager.instance.bColoredBuidlingShow = false;
+            BuildingColor_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "건물효과\n켜기";
+           
+        }
+        else
+        {
+            SystemManager.instance.bColoredBuidlingShow = true;
+            BuildingColor_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "건물효과\n끄기";
+        }
+    }
 
     private void PlaySpeedBtn_Clicked()
     {
@@ -331,22 +426,36 @@ public class UIManager : MonoBehaviour
     }
 
 
-    private void PauseBtn_Clicked()
+    private void ExitProgram()
     {
-        if(!bPause)
-        {
-            bPause = true;
-            Pause_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "다시 실행";
-            Time.timeScale = 0f;
-        }
-        else
-        {
-            bPause = false;
-            Pause_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "정지";
-            Time.timeScale = currentTimeScale;
-        }
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit(); // 어플리케이션 종료
+#endif
         
+
+
     }
+
+
+    public IEnumerator WarningTimer()
+    {
+        Debug.Log("들어옴??");
+        Warning_Panel.SetActive(true);
+        float currentTime = 0f;
+        while (true)
+        {
+            currentTime += Time.deltaTime;
+            if (currentTime >= 2f)
+            {
+                Warning_Panel.SetActive(false);
+                yield break;
+            }       
+        }
+    }
+
+
     #endregion
 
 

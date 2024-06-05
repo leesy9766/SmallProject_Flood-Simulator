@@ -62,7 +62,13 @@ public class DragManager : MonoBehaviour
 
     private void Update()
     {
-        if (SystemManager.instance.view == SystemManager.ViewMode.UIView)
+        Drag();
+    }
+
+
+    private void Drag()
+    {
+        if (SystemManager.instance.view == SystemManager.ViewMode.UIView && !SystemManager.instance.bSimulating)
         {
             if (bcanDrag)
             {
@@ -115,7 +121,6 @@ public class DragManager : MonoBehaviour
             }
         }
     }
-
 
 
     public void Instanciate_WaterPlane()

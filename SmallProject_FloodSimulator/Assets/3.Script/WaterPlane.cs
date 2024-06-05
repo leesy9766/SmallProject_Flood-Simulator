@@ -8,6 +8,11 @@ public class WaterPlane : MonoBehaviour
     public float StorageAmount = 0f;
     public int ManholeCount = 0;
 
+
+    private float colliderSizeY;
+    private float colliderCenterY;
+
+    private RaycastHit hit;
     private void Start()
     {
         Init();
@@ -15,12 +20,13 @@ public class WaterPlane : MonoBehaviour
         StartCoroutine(Flooding_co());
     }
 
+
     private void Init()
     {
         //Debug.Log(StorageAmount);
 
         //강수량 0이면 스피드 0
-        if(SystemManager.instance.RainAmount > 0)
+        if (SystemManager.instance.RainAmount > 0)
         {
             //그냥 강수량에 따른 순수 침수속도
             floodingSpeed = SystemManager.instance.RainAmount / 10f;
@@ -46,7 +52,7 @@ public class WaterPlane : MonoBehaviour
 
             if(StorageAmount >= 0)
             {
-                StorageAmount -= time;
+                StorageAmount -= (time * 0.5f);
             }
             else
             {

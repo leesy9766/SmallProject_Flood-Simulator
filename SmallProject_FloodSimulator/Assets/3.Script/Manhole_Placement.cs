@@ -33,20 +33,29 @@ public class Button_Panel : MonoBehaviour
 
     private void Update()
     {
-    
-        if (SystemManager.instance.bCanManholeCreate && Input.GetMouseButtonDown(0))
-        { 
-            ClickPoint = GetMouseWorldPosition();          
-            if (Physics.Raycast(ClickPoint, transform.up * -1, out hit, Mathf.Infinity, ModelLayer))
+        Manhole_Placement(); 
+    }
+
+
+    private void Manhole_Placement()
+    {
+        if (!SystemManager.instance.bSimulating)
+        {
+            if (SystemManager.instance.bCanManholeCreate && Input.GetMouseButtonDown(0))
             {
-                if(hit.transform.gameObject.CompareTag("Ground"))
+                ClickPoint = GetMouseWorldPosition();
+                if (Physics.Raycast(ClickPoint, transform.up * -1, out hit, Mathf.Infinity, ModelLayer))
                 {
-                    GameObject obj = Instantiate(Manhole_Prefab, hit.point, Quaternion.identity);
-                    obj.transform.SetParent(Manhole_Parent.transform);
-                    SystemManager.instance.ManholeObj_List.Add(obj);
-                }        
-            }   
+                    if (hit.transform.gameObject.CompareTag("Ground"))
+                    {
+                        GameObject obj = Instantiate(Manhole_Prefab, hit.point, Quaternion.identity);
+                        obj.transform.SetParent(Manhole_Parent.transform);
+                        SystemManager.instance.ManholeObj_List.Add(obj);
+                    }
+                }
+            }
         }
+        else Debug.Log("아안된다고 ㅋㅋ");
     }
 
 
