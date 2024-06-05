@@ -52,7 +52,6 @@ public class SystemManager : MonoBehaviour
         }
 
         Init();
-
     }
 
 
@@ -112,7 +111,7 @@ public class SystemManager : MonoBehaviour
             }
 
 
-            TEST_LIST.Add(WaterPlaneObj_List[i].StorageAmount);
+            //TEST_LIST.Add(WaterPlaneObj_List[i].StorageAmount);
             
         }
 

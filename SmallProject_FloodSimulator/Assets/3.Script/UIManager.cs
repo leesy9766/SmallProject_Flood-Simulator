@@ -209,18 +209,16 @@ public class UIManager : MonoBehaviour
             //UIºä¸é ½Ã¹Äºä·Î º¯°æ
             SystemManager.instance.view = SystemManager.ViewMode.SimulationView;
             SystemManager.instance.UseCamera = Camera.main;
-            ViewMode_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "UIºä";    
+            ViewMode_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "UI ºä";    
             RawImage_Panel.SetActive(false);
         }
         else if(SystemManager.instance.view == SystemManager.ViewMode.SimulationView)
         {
             SystemManager.instance.view = SystemManager.ViewMode.UIView;
             SystemManager.instance.UseCamera = SystemManager.instance.UI_Camera;
-            ViewMode_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "½Ã¹Ä·¹ÀÌ¼Ç ºä";
+            ViewMode_Btn.transform.GetChild(0).GetComponent<TMP_Text>().text = "3D ºä";
             RawImage_Panel.SetActive(true);
         }
-
-
     }
 
 

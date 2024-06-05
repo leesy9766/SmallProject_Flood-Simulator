@@ -113,10 +113,7 @@ public class DragManager : MonoBehaviour
                     Destroy(DragImage_obj);
                 }
             }
-        
-
         }
-
     }
 
 

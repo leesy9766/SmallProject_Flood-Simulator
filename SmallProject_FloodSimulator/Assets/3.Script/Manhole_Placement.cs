@@ -36,30 +36,22 @@ public class Button_Panel : MonoBehaviour
     
         if (SystemManager.instance.bCanManholeCreate && Input.GetMouseButtonDown(0))
         { 
-
             ClickPoint = GetMouseWorldPosition();          
             if (Physics.Raycast(ClickPoint, transform.up * -1, out hit, Mathf.Infinity, ModelLayer))
             {
-                Debug.Log("hit point : " + hit.point + "/" + ClickPoint);
-
-                Debug.Log(hit.transform.gameObject);
-
                 if(hit.transform.gameObject.CompareTag("Ground"))
                 {
                     GameObject obj = Instantiate(Manhole_Prefab, hit.point, Quaternion.identity);
                     obj.transform.SetParent(Manhole_Parent.transform);
                     SystemManager.instance.ManholeObj_List.Add(obj);
-                }
-          
-            }
-    
+                }        
+            }   
         }
     }
 
 
     private void Init()
     {
-
         ManholeImage_List = new List<Image>();
         Manhole_List = new List<GameObject>();
     }
@@ -78,15 +70,13 @@ public class Button_Panel : MonoBehaviour
         }
         else
         {
-           
             //// 기본적으로 평면과의 교차를 계산
-            //Plane plane = new Plane(Vector3.up, new Vector3(0, UI_Camera.transform.position.y - 10f, 0)); ;
+            //Plane plane = new Plane(Vector3.up, new Vector3(0, UI_Camera.transform.position.y - 10f, 0)); 
             //if (plane.Raycast(ray, out float distance))
             //{
             //    return ray.GetPoint(distance);
             //}
         }
-
         return Vector3.zero;
     }
 

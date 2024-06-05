@@ -26,7 +26,7 @@ public class Camera_Movement : MonoBehaviour
     [SerializeField] private Quaternion BasicRot_Pers = Quaternion.Euler(90.7f, -179.5f, 180.8f);
 
 
-    private float MaxFieldofView = 450f;
+    private float MaxFieldofView = 1500f;
     private float MinFieldofView = 10f;
 
 
@@ -44,7 +44,7 @@ public class Camera_Movement : MonoBehaviour
 
     //ƒ´∏ﬁ∂Û ¿Ãµø ∞¸∑√----------------------------------------------------------
     private float horizontal, vertical;
-    public float moveSpeed = 20f;
+    public float moveSpeed = 40f;
 
     //∏∂øÏΩ∫ ∞¸∑√ --------------------------------------------------------------
     [SerializeField] public Vector2 CurrentMousePos;
@@ -75,17 +75,19 @@ public class Camera_Movement : MonoBehaviour
             MouseWheelInput = Input.mouseScrollDelta;
             if (MouseWheelInput.y > 0 && SystemManager.instance.UseCamera.orthographicSize >= MinFieldofView)
             {
-                //¡‹¿Œ
-                Debug.Log("¡‹..!¿Œ..!!!!!");
+                //¡‹¿Œ      
                 SystemManager.instance.UseCamera.orthographicSize -= 5f;
+               
 
             }
             else if (MouseWheelInput.y < 0 && SystemManager.instance.UseCamera.orthographicSize <= MaxFieldofView)
             {
-                //¡‹æ∆øÙ
-                Debug.Log("¡‹..!æ∆øÙ..!!!!!");
+                //¡‹æ∆øÙ     
                 SystemManager.instance.UseCamera.orthographicSize += 5f;
+              
             }
+
+          
 
         }
         else
@@ -93,14 +95,12 @@ public class Camera_Movement : MonoBehaviour
             MouseWheelInput = Input.mouseScrollDelta;
             if (MouseWheelInput.y > 0 && SystemManager.instance.UseCamera.fieldOfView >= 2f)
             {
-                SystemManager.instance.UseCamera.transform.position = SystemManager.instance.UseCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, SystemManager.instance.UseCamera.transform.position.y, Input.mousePosition.z));
-                Debug.Log("¡‹..!¿Œ..!!!!!");
+                //SystemManager.instance.UseCamera.transform.position = SystemManager.instance.UseCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, SystemManager.instance.UseCamera.transform.position.y, Input.mousePosition.z));
                 SystemManager.instance.UseCamera.fieldOfView -= 2.5f;
             }
             else if (MouseWheelInput.y < 0 && SystemManager.instance.UseCamera.fieldOfView <= 60f)
             {
                 //UI_Camera.transform.position = new Vector3(Input.mousePosition.x, UI_Camera.transform.position.y, Input.mousePosition.z);
-                Debug.Log("¡‹..!æ∆øÙ..!!!!!");
                 SystemManager.instance.UseCamera.fieldOfView += 2.5f;
             }
         }
@@ -133,7 +133,6 @@ public class Camera_Movement : MonoBehaviour
             if (Input.GetMouseButton(1))
             {
                 UpdateRotate();
-
             }
         }
 
@@ -152,7 +151,7 @@ public class Camera_Movement : MonoBehaviour
 
         if (SystemManager.instance.UseCamera.orthographic)
         {
-            SystemManager.instance.UseCamera.orthographicSize = 450f;
+            SystemManager.instance.UseCamera.orthographicSize = MaxFieldofView;
         }
         else
         {

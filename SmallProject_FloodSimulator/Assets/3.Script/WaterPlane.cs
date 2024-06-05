@@ -59,10 +59,7 @@ public class WaterPlane : MonoBehaviour
                     transform.position = new Vector3(transform.position.x, transform.position.y + waterlevel, transform.position.z);
                 }
               
-            }
-
-           
-           
+            }    
             yield return new WaitForSeconds(time);
         }
     }
